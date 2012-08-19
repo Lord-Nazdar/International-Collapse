@@ -1,0 +1,413 @@
+<! DOCTYPE html>
+<html>
+    <head>
+        <title>StratJS</title>
+        
+		<script type="text/javascript" src="lib/jquery.js"></script>
+		<script type="text/javascript" src="lib/kinetic.js"></script>
+		<script type="text/javascript" src="lib/tween.js"></script>
+
+		<script type="text/javascript" src="vector.js"></script>
+		<script type="text/javascript" src="UI.js"></script>
+		<script type="text/javascript" src="log.js"></script>
+		<script type="text/javascript" src="player.js"></script>
+		<script type="text/javascript" src="Class.js"></script>
+		<script type="text/javascript" src="HexMath.js"></script>
+		<script type="text/javascript" src="Utilities.js"></script>
+		<script type="text/javascript" src="EventHandler.js"></script>
+		<script type="text/javascript" src="UnitModel.js"></script>
+		<script type="text/javascript" src="UnitEntity.js"></script>
+		<script type="text/javascript" src="UnitController.js"></script>
+		<script type="text/javascript" src="MapController.js"></script>
+		<script type="text/javascript" src="Resources.js"></script>
+		<script type="text/javascript" src="Astar.js"></script>
+		<script type="text/javascript" src="main.js"></script>
+		<style>
+		body{
+			margin:0px;
+			overflow:hidden;
+			min-widtth:1280px;
+			min-height:1024px;
+		}
+			#container{
+				width:100%;
+				height:100%;
+				background-color:green;
+			}
+			#unitInfo{
+				position:absolute;
+				width:10%;
+				top:0px;
+				right:0%;
+				height:100%;
+			}
+			.legend{
+				margin:0px;
+				background-color:red;
+			}
+			
+			#sideInfo{
+				position:fixed;
+				width:40%;
+				left:30%;
+				height:30px;
+				bottom:0px;
+				color:white;
+				text-align:center;
+			}
+			
+			#nextTurnButton{
+				position:fixed;
+				width:20%;
+				left:40%;
+				height:30px;
+				bottom:30px;
+				color:white;
+				text-align:center;
+				background-color:black;
+			}
+			
+			#leftSideInfo{
+				position:absolute;
+				left:0px;
+				width:50%;
+				height:100%;
+				margin:0px;
+				background-color:blue;
+			}
+			#rightSideInfo{
+				position:absolute;
+				right:0px;
+				height:100%;
+				width:50%;
+				margin:0px;
+				background-color:red;
+			}
+			
+			#deployMenu{
+				position:absolute;
+				width:10%;
+				top:0px;
+				left:0%;
+				height:100%;
+			}
+			
+			#log{
+				position:absolute;
+				width:25%;
+				bottom:0px;
+				left:0px;
+				height:20%;
+				overflow:hidden;
+				opacity:0.0;
+				-webkit-transition: all 1s ease;
+			}
+			
+			#unitMenu{
+				position:absolute;
+				width:30%;
+				height:15%;
+				right:0px;
+				bottom:0px;
+			}
+			
+			#symbActionMenu{
+				position:relative;
+				float:right;
+				width:20%;
+				height:100%;
+				background-color:blue;
+				border-radius:100% 0 0 0;
+				background-image:url("images/stripesBlue.png");
+				-webkit-box-shadow: inset 0px 0px 50px 2px #000000;
+				border:1px solid black;
+				margin-right:-2px;
+			}
+			
+			#symbUnitMenu{
+				position:relative;
+				float:right;
+				width:38%;
+				height:100%;
+				background-color:red;
+				background-image:url("images/stripesBlue.png");
+				-webkit-box-shadow: inset 0px 0px 50px 2px #000000;
+				border:1px solid black;
+				margin-right:-1px;
+			}
+			
+			#actionRightUnitMenu{
+				position:relative;
+				float:right;
+				width:40%;
+				height:100%;
+				background-color:white;
+				border:1px solid black;
+			}
+			
+			
+			#unitMenu{
+				margin:0px;
+			}
+			
+			#deployMenu{
+				position:absolute;
+				width:10%;
+				height:70%;
+				top:0px;
+				left:0px;
+			}
+			
+			#topDeploy{
+				position:absolute;
+				width:100%;
+				height:15%;
+				background-color:white;
+				border-radius:0 0 5px	0;
+				background-image:url("images/stripesBlue.png");
+				-webkit-box-shadow: inset 0px 0px 50px 2px #000000;
+				border:1px solid black;
+			}
+			
+			#topDeployText{
+				position:absolute;
+				margin:0px;
+				top:40%;
+				width:100%;
+				text-align:center;
+				font-size:160%;
+				font-weight:bold;
+			}
+			
+			#topDeployArrow{
+				position:absolute;
+				margin:0px;
+				top:40%;
+				width:100%;
+				text-align:center;
+				font-size:300%;
+				font-weight:bold;
+				color:white;
+				opacity:0.5;
+			}
+			
+			#deployPoint{
+				position:absolute;
+				height:25%;
+				width:60%;
+				top:0px;
+				left:0px;
+				border:2px black solid;
+				background-color:1A1A1A;
+				opacity:0.5;
+				color:white;
+			}
+			
+			#deployPoint p{
+				margin:0px;
+				float:left;
+				margin-right:5px;
+				font-size:0.9em;
+			}
+			
+			.unitDeploy{
+				position:absolute;
+				width:80%;
+				height:12%;
+				background-color:white;
+				border-radius:0 5px 5px 0;
+				-webkit-transition: all 1s ease;
+				background-image:url("images/stripesBlue.png");
+				-webkit-box-shadow: inset 0px 0px 50px 2px #000000;
+				border:1px solid black;
+				text-align:center;
+			}		
+
+			.unitDeploy:hover{
+				-webkit-box-shadow: inset 0px 0px 30px 2px #1C1C1C;
+				background-image:url("images/stripesBlueHover.png");
+			}				
+			
+			#skills{
+				position:absolute;
+				left:10%;
+				top:0px;
+				height:7%;
+				width:40%;
+			}
+			
+			.skillElement{
+				position:relative;
+				height:100%;
+				width:20%;
+				background-color:white;
+				border-radius:0 0 5px 5px;
+				float:left;
+				margin-left:5%;
+				-webkit-box-shadow: inset 0px 0px 50px 2px #000000;
+				border:1px solid black;
+			}
+			
+			#stripesOverSkill{
+				background-image:url("images/stripesBlueAlpha.png") ;
+				position:absolute;
+				width:100%;
+				height:100%;
+			}
+			
+			.retramage{
+				position:absolute;
+				width:100%;
+				height:100%;
+				background-image:url("images/stripesBlueAlpha.png") ;
+				top:0px;
+			}
+			
+			#side{
+				position:absolute;
+				width:30%;
+				top:0px;
+				right:0px;
+				height:20%;
+			}
+			
+			#sideName{
+				position:absolute;
+				right:0px;
+				top:0px;
+				margin:0px;
+				height:25%;
+				width:70%;
+				background-color:#003059;
+				color:white;
+				border-radius: 0 0 0 10px;
+				padding-left:10%;
+				font-size:140%;
+				line-height:50px;
+				vertical-align:middle;
+				-webkit-transition: -webkit-transform 1s ease-in-out;
+				-webkit-transform-origin: 100% 0%;
+				-webkit-box-shadow: inset 10px -10px 50px -10px #000000;
+			}
+		
+			#sideImg{
+				position:absolute;
+				right:0px;
+				top:0px;
+			}
+			
+			.actionButton{
+				position:relative;
+				height:50%;
+				width:50%;
+				float:left;
+				margin:-1px;
+				background-image:url("images/stripesBlue.png");
+				-webkit-box-shadow: inset 0px 0px 50px 2px #000000;
+				border:1px solid black;
+				text-align:center;
+			}
+			
+			.actionButton:hover{
+				background-image:url("images/stripesBlueHover.png");
+			}
+			
+			.actionValue{
+				position:absolute;
+				height:30%;
+				width:40%;
+				top:0px;
+				left:0px;
+				border:2px black solid;
+				background-color:#1A1A1A;
+				opacity:0.5;
+				color:white;
+				text-align:center;
+				padding:0px;
+			}
+			
+		</style>
+    </head>
+    <body onLoad="main()">    
+        <div id="container"></div>
+		
+		<div id="log">
+		</div>
+		
+		<div id="unitMenu">
+			<div id="actionRightUnitMenu">
+				<div id="moveAction" class="actionButton" onClick="action='move'">
+					<div id="moveValue" class="actionValue">2</div>
+					<img src="images/move.png" height="95%" style="position:absolute;top:2.5%;right:15%;">
+				</div>
+				<div id="rotateAction"  class="actionButton" onClick="action='rotate'">
+					<div id="rotateValue" class="actionValue">1</div>
+					<img src="images/rotate.png" height="95%" style="position:absolute;top:2.5%;right:15%;">
+				</div>
+				<div id="attackAction"  class="actionButton">
+					<div id="attackValue" class="actionValue">1</div>
+					<img src="images/attack.png" height="95%" style="position:absolute;top:2.5%;right:15%;">
+				</div>
+				<div id="specialAction"  class="actionButton">
+					<div id="specialValue" class="actionValue">1</div>
+					<img src="images/board.png" height="95%" width="auto" style="position:relative;top:2.5%;text-align:center;">
+				</div>
+			</div>
+			<div id="symbUnitMenu">
+			</div>
+			<div id="symbActionMenu">
+			</div>
+		</div>
+		
+		<div id="side">
+			<p id="sideName" onClick="switchTurn()">NATO</p>
+			<img id="sideImg" src="images/NATO.png" width="40%"/>
+		</div>
+		
+		<div id="deployMenu">
+			<div class="unitDeploy" id="tankDeploy" onClick="buyUnit('tank')">
+				<img src="images/tankDeploy.png" width="90%"/>
+				<div class="retramage"></div>
+			</div>
+			<div class="unitDeploy" id="atDeploy" onClick="buyUnit('at')">
+				<img src="images/atDeploy.png" height="90%"/>
+				<div class="retramage"></div>
+			</div>
+			<div class="unitDeploy" id="infDeploy" onClick="buyUnit('inf')">
+				<img src="images/infDeploy.png" height="90%"/>
+				<div class="retramage"></div>
+			</div>
+			<div class="unitDeploy" id="apcDeploy" onClick="buyUnit('apc')">
+				<img src="images/apcDeploy.png" height="90%"/>
+				<div class="retramage"></div>
+			</div>
+			<div class="unitDeploy" id="mlrsDeploy" onClick="buyUnit('mlrs')">
+				<img src="images/mlrsDeploy.png" height="90%"/>
+				<div class="retramage"></div>
+			</div>
+			<div class="unitDeploy" id="sniperDeploy" onClick="buyUnit('sniper')">
+				<img src="images/sniperDeploy.png" height="90%"/>
+				<div class="retramage"></div>
+			</div>
+			
+			<div id="topDeploy" onClick="deployDeployMenu()">
+				<div id="deployPoint">
+					<p id="actual">1994</p>
+					<p><</p>
+					<p id="total">2012</p>
+				</div>
+				<p id="topDeployText">Deploy</p>
+			</div>
+		</div>
+		
+		<div id="skills">
+			<div class="skillElement">
+				Fortification
+			</div>
+			<div class="skillElement">
+				Radio interference
+			</div>
+		</div>
+		
+    </body>
+</html>
