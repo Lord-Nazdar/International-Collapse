@@ -1,4 +1,4 @@
 International-Collapse
 ======================
 
-Strategy game with hexagonal box in your web browser
+Browser-based multiplayer strategy game over an hexagonal grid
